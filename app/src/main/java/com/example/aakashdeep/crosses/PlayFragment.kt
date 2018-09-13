@@ -17,7 +17,8 @@ class PlayFragment : Fragment(), View.OnClickListener {
     val TAG:String = "ak_playfragment"
 
     var firstPlayer:Boolean = true
-    val userClicks = IntArray(5, { i -> 0})
+
+    var userClicksArray=arrayOf(arrayOf(0,0,0),arrayOf(0,0,0),arrayOf(0,0,0))
 //    private var mListener: OnFragmentInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -116,11 +117,28 @@ class PlayFragment : Fragment(), View.OnClickListener {
 
     fun onPlayerClick(row: Int, column:Int, view: View?){
         Log.d(TAG, "firstPlayer: " + firstPlayer)
+
+        val currentRow = row.dec()
+        val currentCol = column.dec()
+
+        var playerValue:Int
         if(firstPlayer){
+            playerValue = 1
             viewModifier(view, "X", true, R.color.colorAccent )
+
+            userClicksArray[currentRow][currentCol]=1
         } else{
+            playerValue = 2
             viewModifier(view, "O", true, R.color.colorPrimary )
+            userClicksArray[currentRow][currentCol]=2
         }
+
+        val result = checkWinningCondition(playerValue, currentRow, currentCol)
+
+        if(result == true){
+            Log.d(TAG, "We have a winner")
+        }
+
         firstPlayer = firstPlayer.not() //Next players chance
 
 
@@ -134,4 +152,26 @@ class PlayFragment : Fragment(), View.OnClickListener {
             b.setBackgroundColor(resources.getColor(color))
         }
     }
+
+    fun checkWinningCondition(playerValue: Int, currentRow: Int, currentCol: Int): Boolean {
+        return ((userClicksArray[currentRow][0] === playerValue
+
+                && userClicksArray[currentRow][1] === playerValue
+                && userClicksArray[currentRow][2] === playerValue)
+                || (userClicksArray[0][currentCol] === playerValue
+
+                && userClicksArray[1][currentCol] === playerValue
+                && userClicksArray[2][currentCol] === playerValue)
+                || (currentRow == currentCol
+
+                && userClicksArray[0][0] === playerValue
+                && userClicksArray[1][1] === playerValue
+                && userClicksArray[2][2] === playerValue)
+                || (currentRow + currentCol == 2
+
+                && userClicksArray[0][2] === playerValue
+                && userClicksArray[1][1] === playerValue
+                && userClicksArray[2][0] === playerValue))
+    }
+
 }
